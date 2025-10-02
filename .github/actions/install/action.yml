@@ -1,0 +1,33 @@
+inputs:
+  unity_editor_url:
+    description: "Direct download URL for Unity editor"
+    required: true
+
+  unity_editor_version:
+    description: "Unity editor version (used as key for cache)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/cache@v2.1.7
+      id: install-cache
+      with:
+        path: C:\Unity\
+        key: ${{ runner.os }}-${{ inputs.unity_editor_version }}
+
+    - shell: pwsh
+      if: steps.install-cache.outputs.cache-hit != 'true'
+      run: mkdir C:\Unity
+
+    - shell: pwsh
+      if: steps.install-cache.outputs.cache-hit != 'true'
+      run: C:\msys64\usr\bin\wget.exe -O C:\Unity\UnitySetup64.exe ${{ inputs.unity_editor_url }}
+
+    - shell: pwsh
+      if: steps.install-cache.outputs.cache-hit != 'true'
+      run: Start-Process -FilePath "C:\Unity\UnitySetup64.exe" -ArgumentList "/S", "/D=C:\Unity" -NoNewWindow -Wait
+
+    - shell: pwsh
+      if: steps.install-cache.outputs.cache-hit != 'true'
+      run: Remove-Item C:\Unity\UnitySetup64.exe

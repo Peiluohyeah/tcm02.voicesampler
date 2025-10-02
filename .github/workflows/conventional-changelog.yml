@@ -1,0 +1,57 @@
+name: Update Changelog
+
+on:
+    push:
+      branches:
+        - main
+    pull_request:
+      branches:
+        - main
+
+jobs:
+  update-changelog:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+            ref: ${{ github.head_ref || github.ref_name }}
+     
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+
+      - name: Check output
+        run: echo ${{ steps.vars.outputs.short_ref }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install -g conventional-changelog-cli
+
+      - name: Run Changelog Script
+        run: conventional-changelog -p angular -i CHANGELOG.md -s
+      
+      - name: Print Context
+        run: |
+          echo "$GITHUB_CONTEXT"
+          
+      - name: Print Context and Commit Changes
+        run: |
+
+            git config --local user.email "futurecolossal@futurecolossal.com"
+            git config --local user.name "futurecolossal"
+            
+            CURRENT_BRANCH=${{ github.head_ref || github.ref_name }}
+            echo "Current Branch >>>>: $CURRENT_BRANCH"
+            git add CHANGELOG.md
+            git commit -m "chore: update changelog"
+            git push origin $CURRENT_BRANCH
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

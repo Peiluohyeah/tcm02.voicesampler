@@ -1,0 +1,18 @@
+inputs:
+  unity_email:
+    description: "Unity Pro email"
+    required: true
+
+  unity_password:
+    description: "Unity Pro password"
+    required: true
+
+  unity_serial:
+    description: "Unity Pro serial"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - shell: pwsh
+      run: C:\Unity\Editor\Unity.exe -batchmode -quit -nographics -username "${{ inputs.unity_email }}" -password "${{ inputs.unity_password }}" -serial "${{ inputs.unity_serial }}" -logfile - | Out-Default

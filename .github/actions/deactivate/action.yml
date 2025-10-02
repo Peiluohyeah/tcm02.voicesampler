@@ -1,0 +1,6 @@
+runs:
+  using: "composite"
+  steps:
+    - shell: pwsh
+      run: C:\Unity\Editor\Unity.exe -batchmode -quit -nographics -returnlicense -logfile - | Out-Default
+

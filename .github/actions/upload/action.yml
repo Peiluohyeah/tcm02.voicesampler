@@ -1,0 +1,93 @@
+inputs:
+  # aws_region:
+  #   description: "AWS region"
+  #   required: true
+  # 
+  # aws_access_key_id:
+  #   description: "AWS access key ID"
+  #   required: true
+  # 
+  # aws_secret_access_key:
+  #   description: "AWS secret access key"
+  #   required: true
+  # 
+  # aws_s3:
+  #   description: "URI of AWS S3 bucket"
+  #   required: true
+
+  build_path:
+    description: "Build path to zip"
+    required: true
+
+  artifact_prefix:
+    description: "File prefix for upload"
+    required: true
+
+  branch:
+    description: "Current GIT branch"
+    required: true
+
+  version:
+    description: "File version"
+    required: true
+
+  azure_storage_name:
+    description: 'Azure Storage account name'
+    required: true
+
+  azure_storage_key:
+    description: 'Azure Blob Storage key'
+    required: true
+
+  azure_storage_container:
+    description: 'Azure Storage container name'
+    required: true    
+
+runs:
+  using: "composite"
+  steps:
+    # Compress
+    - id: compress
+      shell: pwsh
+      run: |
+        $work_dir="$cur_dir\upload"
+        $dir_to_zip="${{ inputs.build_path }}\*"
+        $zip_file="C:\Upload\${{ inputs.artifact_prefix }}-${{ inputs.version }}.zip"
+        & "C:\Program Files\7-Zip\7z.exe" a $zip_file $dir_to_zip
+        echo "::set-output name=filepath::$zip_file"
+
+    # # AWS Credentials
+    # - uses: aws-actions/configure-aws-credentials@v1
+    #   with:
+    #     aws-access-key-id: ${{ inputs.aws_access_key_id }}
+    #     aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+    #     aws-region: ${{ inputs.aws_region }}
+
+    # # Upload to S3
+    # - shell: pwsh
+    #   run: |
+    #     $s3_path="${{ inputs.aws_s3 }}/${{ inputs.branch }}"
+    #     aws s3 cp ${{ steps.compress.outputs.filepath }} $s3_path/
+
+
+
+    # Upload to GitHub Artifacts
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ inputs.artifact_prefix }}-${{ inputs.version }}
+        path: ${{ inputs.build_path }}
+        retention-days: 1
+
+    # Upload zip to Azure Storage
+    - shell: pwsh
+      run: |
+        $zip_filepath="${{ steps.compress.outputs.dir_to_zip }}"
+        $zip_filename="${{ steps.compress.outputs.zip_file }}"
+        az extension add --name storage-preview
+        az storage container create -n "${{ inputs.azure_storage_container }}" --account-name "${{ inputs.azure_storage_name }}" --account-key "${{ inputs.azure_storage_key }}"
+        az storage azcopy blob upload -c "${{ inputs.azure_storage_container }}" --account-name "${{ inputs.azure_storage_name }}" --account-key "${{ inputs.azure_storage_key }}" -s "$zip_filepath" -d "$zip_filename"
+        $build_dir="${{ inputs.build_path }}"
+        $current_filename = ".current"
+        $current_filepath = "$build_dir\$current_filename"
+        "$zip_filename" > $current_filepath 
+        az storage azcopy blob upload -c "${{ inputs.azure_storage_container }}" --account-name "${{ inputs.azure_storage_name }}" --account-key "${{ inputs.azure_storage_key }}" -s "$current_filepath" -d "$current_filename"

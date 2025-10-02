@@ -1,0 +1,23 @@
+inputs:
+  project_path:
+    description: "Project folder from root"
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+
+
+    - shell: pwsh
+      working-directory: ${{ inputs.project_path }}
+      run: |
+        New-Item -ItemType Directory -Force -Path C:\TestResults
+        C:\Unity\Editor\Unity.exe -batchmode -runTests -testResults C:\TestResults\EditModeTests.xml -testPlatform EditMode -projectPath . -logfile - | Out-Default
+
+    - uses: actions/upload-artifact@v2.3.1
+      if: always()
+      with:
+        name: EditModeTests
+        path: C:\TestResults\EditModeTests.xml
+        retention-days: 1

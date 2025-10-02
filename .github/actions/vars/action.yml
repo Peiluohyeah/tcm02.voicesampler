@@ -1,0 +1,100 @@
+name: "vars"
+description: "Global Variables (no secrets)"
+
+outputs:
+  # SET
+  project_path:
+    description: "Unity Project folder from root"
+    value: "TemplateProject"
+
+  # SET
+  product_name:
+    description: "Application build name"
+    value: "FCTemplate"
+
+  # SET
+  build_path:
+    description: "Build directory"
+    value: C:\Build
+
+  # SET
+  artifact_prefix:
+    description: "File prefix for upload"
+    value: "FCTemplate"
+
+  # SET
+  unity_editor_url:
+    description: "Direct download URL for Unity editor"
+    value: "https://download.unity3d.com/download_unity/d29bea25151d/Windows64EditorInstaller/UnitySetup64-2022.3.18f1.exe"
+
+  # SET
+  unity_editor_version:
+    description: "Unity editor version (used as key for cache)"
+    value: "2022.3.18"
+
+  # SET
+  azure_storage_container:
+    description: 'Azure Storage container name for product releases'
+    value: 'release'
+
+  # SET
+  azure_storage_container_scripts:
+    description: 'Azure Storage container name for scripts'
+    value: 'scripts'
+
+  # AUTO
+  branch:
+    description: "Latest GIT branch (assume main branch when tagging)"
+    value: ${{ steps.gen_branch.outputs.branch }}
+
+  # AUTO
+  version:
+    description: "Latest GIT version from tag"
+    value: ${{ steps.gen_version.outputs.version }}
+
+  # By Package.json
+  # # AUTO
+  # version:
+  #   description: 'Latest version from package.json'
+  #   value: ${{ steps.gen_version.outputs.version }}
+
+  # # AUTO
+  # product_name:
+  #   description: 'Name from package.json'
+  #   value: ${{ steps.gen_name.outputs.product_name }}
+
+
+runs:
+  using: "composite"
+  steps:
+    - id: gen_branch
+      shell: bash
+      run: |
+        ref_type=${{ github.ref_type }}
+        event_name=${{ github.event_name }}
+        if [ $ref_type == 'branch' ] && [ $event_name == 'push' ]
+        then
+          branch=${{ github.ref_name }}
+        elif [ $ref_type == 'branch' ] && [ $event_name == 'pull_request' ]
+        then
+          branch=${{ github.head_ref }}
+        else
+          branch=main
+        fi
+        echo $branch
+        echo ::set-output name=branch::$(echo $branch)
+
+    - id: gen_version
+      shell: bash
+      working-directory: ${{ inputs.work_dir }}
+      run: |
+        tags=$(git rev-list --tags --max-count=1)
+        if [ -z $tags ]
+        then
+          ver='0.0.0'
+        else
+          tag=$(git describe --tags $tags)
+          ver=$(echo $tag | sed 's/^v//')
+        fi
+        echo $ver
+        echo ::set-output name=version::$(echo $ver)

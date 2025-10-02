@@ -1,0 +1,23 @@
+inputs:
+  project_path:
+    description: "Project folder from root"
+    required: true
+
+  build_path:
+    description: "Directory used for built"
+    required: true
+
+  product_name:
+    description: "App name used for build"
+    required: true
+
+  version:
+    description: "Version string used for build"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - shell: pwsh
+      working-directory: ${{ inputs.project_path }}
+      run: C:\Unity\Editor\Unity.exe -batchmode -quit -logfile - -executeMethod Builder.Build -projectPath . -buildTarget StandaloneWindows64 -buildPath "${{ inputs.build_path }}" -productName "${{ inputs.product_name }}" -buildVersion "${{ inputs.version }}" | Out-Default

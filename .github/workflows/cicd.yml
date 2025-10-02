@@ -1,0 +1,79 @@
+name: Unity CI/CD
+
+on:
+  push:
+    branches: [qa, staging, production]
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  ci_cd:
+    name: CI/CD
+    if: ${{ false }}
+    runs-on: windows-latest
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      # - name: Check Out Submodule
+      #   uses: ./.github/actions/submodule
+      #   with:
+      #     submodule_path: lp.CommonToolsExample/Assets/lp.commonTools.unity
+      #     submodule_uri: git@github.com:local-projects/lp.commonTools.unity.git
+      #     submodule_key: ${{ secrets.SUBMODULE_KEY }}
+      #     submodule_key_host: ${{ secrets.SUBMODULE_KEY_HOST }}
+
+      - name: Get Variables
+        id: vars
+        uses: ./.github/actions/vars
+
+      - name: Install
+        uses: ./.github/actions/install
+        with:
+          unity_editor_url: ${{ steps.vars.outputs.unity_editor_url }}
+          unity_editor_version: ${{ steps.vars.outputs.unity_editor_version }}
+
+      - name: Activate
+        uses: ./.github/actions/activate
+        with:
+          unity_email: ${{ secrets.UNITY_EMAIL }}
+          unity_password: ${{ secrets.UNITY_PASSWORD }}
+          unity_serial: ${{ secrets.UNITY_SERIAL }}
+
+      # - name: Test
+      #   uses: ./.github/actions/test
+      #   with:
+      #     project_path: ${{ steps.vars.outputs.project_path }}
+
+      - name: Make Build
+        id: build
+        uses: ./.github/actions/makeBuild
+        with:
+          project_path: ${{ steps.vars.outputs.project_path }}
+          product_name: ${{ steps.vars.outputs.product_name }}
+          build_path: ${{ steps.vars.outputs.build_path }}
+          version: ${{ steps.vars.outputs.version }}
+
+      # - name: Upload
+      #   uses: ./.github/actions/upload
+      #   with:
+      #     # aws_region: ${{ steps.vars.outputs.aws_region }}
+      #     # aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     # aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     # aws_s3: ${{ steps.vars.outputs.aws_s3 }}
+
+      #     azure_storage_key: ${{ secrets.AZURE_STORAGE_KEY }}
+      #     azure_storage_name: ${{ secrets.AZURE_STORAGE_NAME }}
+      #     azure_storage_container: ${{ steps.vars.outputs.azure_storage_container }}
+
+      #     build_path: ${{ steps.vars.outputs.build_path }}
+      #     artifact_prefix: ${{ steps.vars.outputs.artifact_prefix }}
+      #     branch: ${{ steps.vars.outputs.branch }}
+      #     version: ${{ steps.vars.outputs.version }}
+
+      - name: Deactivate
+        if: always()
+        uses: ./.github/actions/deactivate

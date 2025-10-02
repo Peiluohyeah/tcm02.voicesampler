@@ -1,0 +1,56 @@
+name: Unity CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: CI
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          fetch-depth: 0
+      
+      # Make sure the @v0.8.0 matches the current version of the action
+      - uses: webfactory/ssh-agent@v0.8.0
+        with:
+            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}    
+
+      - name: Get Variables
+        id: vars
+        uses: ./.github/actions/vars
+
+      - name: Install
+        uses: ./.github/actions/install
+        with:
+          unity_editor_url: ${{ steps.vars.outputs.unity_editor_url }}
+          unity_editor_version: ${{ steps.vars.outputs.unity_editor_version }}
+
+      - name: Activate
+        uses: ./.github/actions/activate
+        with:
+          unity_email: ${{ secrets.UNITY_EMAIL }}
+          unity_password: ${{ secrets.UNITY_PASSWORD }}
+          unity_serial: ${{ secrets.UNITY_SERIAL }}
+
+      - name: Test
+        uses: ./.github/actions/test
+        with:
+          project_path: ${{ steps.vars.outputs.project_path }}  
+
+      # - name: Test Runner
+      #   uses: game-ci/unity-test-runner@v2  
+      #   with:
+      #     projectPath: ${{ steps.vars.outputs.project_path }}
+
+      - name: Deactivate
+        if: always()
+        uses: ./.github/actions/deactivate
