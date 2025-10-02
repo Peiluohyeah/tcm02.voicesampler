@@ -1,0 +1,86 @@
+{
+  "scopedRegistries": [
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.openupm"
+      ]
+    },
+    {
+      "name": "Keijiro",
+      "url": "https://registry.npmjs.com",
+      "scopes": [
+        "jp.keijiro"
+      ]
+    },
+    {
+      "name": "yasirkula",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.yasirkula"
+      ],
+      "overrideBuiltIns": true
+    },
+    {
+      "name": "tayx",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.tayx"
+      ],
+      "overrideBuiltIns": true
+    },
+    {
+      "name": "elraccoone",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "nl.elraccoone"
+      ],
+      "overrideBuiltIns": true
+    },
+    {
+      "name": "madsbangh",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.madsbangh"
+      ],
+      "overrideBuiltIns": true
+    }
+  ],
+  "dependencies": {
+    "com.futurecolossal.analytics": "git@github.com:Future-Colossal/fclibs.analytics.git",
+    "com.futurecolossal.core": "git@github.com:Future-Colossal/fclibs.core.git",
+    "com.futurecolossal.core.interop": "git@github.com:Future-Colossal/fclibs.core.interop",
+    "com.futurecolossal.core.interop.unity": "git@github.com:Future-Colossal/fclibs.core.interop.unity",
+    "com.futurecolossal.easysettings": "git@github.com:Future-Colossal/fclibs.easy-settings.git",
+    "com.futurecolossal.easytweak": "git@github.com:Future-Colossal/fclibs.easytweak.git",
+    "com.futurecolossal.networking": "git@github.com:future-colossal/fclibs.fc-p2p-networking",
+    "com.futurecolossal.runtimedebugging": "git@github.com:Future-Colossal/fclibs.runtime-profiling.git",
+    "com.futurecolossal.shortcutmanager": "git@github.com:Future-Colossal/fclibs.shortcutmanager.git",
+    "com.futurecolossal.threading": "git@github.com:future-colossal/fclibs.threading",
+    "com.tayx.graphy": "3.0.5",
+    "com.unity.collections": "2.5.7",
+    "com.unity.ide.rider": "3.0.38",
+    "com.unity.ide.visualstudio": "2.0.23",
+    "com.unity.inputsystem": "1.14.2",
+    "com.unity.render-pipelines.universal": "17.0.4",
+    "com.unity.toolchain.win-x86_64-linux-x86_64": "2.0.10",
+    "com.unity.ugui": "2.0.0",
+    "com.yasirkula.ingamedebugconsole": "1.8.2",
+    "com.unity.modules.animation": "1.0.0",
+    "com.unity.modules.audio": "1.0.0",
+    "com.unity.modules.director": "1.0.0",
+    "com.unity.modules.imageconversion": "1.0.0",
+    "com.unity.modules.imgui": "1.0.0",
+    "com.unity.modules.jsonserialize": "1.0.0",
+    "com.unity.modules.particlesystem": "1.0.0",
+    "com.unity.modules.physics": "1.0.0",
+    "com.unity.modules.screencapture": "1.0.0",
+    "com.unity.modules.terrainphysics": "1.0.0",
+    "com.unity.modules.ui": "1.0.0",
+    "com.unity.modules.uielements": "1.0.0",
+    "com.unity.modules.video": "1.0.0",
+    "com.unity.modules.vr": "1.0.0",
+    "com.unity.modules.xr": "1.0.0"
+  }
+}
